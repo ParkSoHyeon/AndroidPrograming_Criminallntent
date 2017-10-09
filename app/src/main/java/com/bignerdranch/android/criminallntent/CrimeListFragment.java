@@ -1,5 +1,6 @@
 package com.bignerdranch.android.criminallntent;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -18,6 +19,12 @@ public class CrimeListFragment extends Fragment {
 
     private CrimeAdapter mCrimeAdapter;
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateUI();
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -33,12 +40,15 @@ public class CrimeListFragment extends Fragment {
 
     private void updateUI() {
         CrimeLab crimeLab = CrimeLab.getInstance(getActivity());
-
         List<Crime> crimes = crimeLab.getCrimes();
 
-        mCrimeAdapter = new CrimeAdapter(crimes);
-
-        mRecyclerView.setAdapter(mCrimeAdapter);
+        if(mCrimeAdapter == null) {
+            mCrimeAdapter = new CrimeAdapter(crimes);
+            mRecyclerView.setAdapter(mCrimeAdapter);
+        }
+        else {
+            mCrimeAdapter.notifyDataSetChanged();
+        }
     }
 
     private class CrimeHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -67,7 +77,9 @@ public class CrimeListFragment extends Fragment {
 
         @Override
         public void onClick(View view) {
+            Intent intent = CrimeActivity.newIntent(getActivity(), mCrime.getId());
 
+            startActivity(intent);
         }
     }
 
